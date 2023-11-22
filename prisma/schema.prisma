@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  @@map("Users")
+  id                   Int        @id @default(autoincrement())
+  created_at           DateTime   @default(now())
+  birth_date           DateTime
+  email                String     @unique
+  gender               UserGender
+  last_name            String
+  name                 String
+  national_id          Int        @unique
+  national_id_type     String
+  phone                Int
+  terms_and_conditions Boolean    @default(false)
+  user_type            UserType
+  user_id              String     @unique
+  location             String
+  economic_sector      String
+  contract_type        String
+  insitution           String
+  projects             Project[]
+}
+
+model Project {
+  @@map("Projects")
+  id                Int                 @id @default(autoincrement())
+  aprroved          Boolean
+  balance           Int
+  capital           Int
+  created_at        DateTime            @default(now())
+  dream             String
+  fee_rate          Decimal
+  finished          Boolean
+  initial_payment   Int
+  interest_rate     Decimal
+  matched_date      DateTime
+  messages          Message[]
+  monthly_payment   Int
+  months            Int
+  is_new            Boolean
+  project_id        String              @unique
+  selling           Boolean
+  updated_at        DateTime
+  warranty          String
+  users             User[]
+  PaymentPlan       PaymentPlans[] @relation()
+  AccountStatements AccountStatements[] @relation
+}
+
+model PaymentPlans {
+  @@map("PaymentPlans")
+  id           Int      @id @default(autoincrement())
+  period       Int
+  balance      Int
+  payment_date DateTime
+  interest_fee Int
+  capital_fee  Int
+  monthly_fee  Int
+  project_id   String   @unique
+  project      Project  @relation(fields: [project_id], references: [project_id])
+}
+
+model AccountStatements {
+  @@map("AccountStatements")
+  id           Int      @id @default(autoincrement())
+  created_at   DateTime @default(now())
+  period       Int
+  balance      Int
+  payment_date DateTime
+  interest_fee Int
+  capital_fee  Int
+  monthly_fee  Int
+  rate_fee     Int
+  cut_off_date DateTime
+  late_payment Int
+  app_fee      Int
+  project_id   String   @unique
+  project      Project  @relation(fields: [project_id], references: [project_id])
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  project_id String
+  title      String
+  created_at DateTime @default(now())
+  message    String
+  Project    Project? @relation(fields: [project_id], references: [project_id])
+}
+
+enum UserType {
+  client
+  investor
+  admin
+}
+
+enum UserGender {
+  male
+  female
+}
